@@ -11,13 +11,18 @@
 }
   
 .total-cost {
+    flex: 1;
+    text-align: left;
     padding-left: 15px;
     font-size: 16px;
 }
 
 .limit {
+    flex: 1;
+    text-align: left;
     padding-left: 15px;
     font-size: 16px;
+
 }
 
 .clear-list {

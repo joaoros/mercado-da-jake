@@ -2,7 +2,7 @@ import React from 'react';
 import deleteIcon from '../assets/delete.svg';
 import '../styles/Footer.css';
 
-const Footer = ({ totalCost, clearList, limit }) => {
+const Footer = ({ totalCost, clearList, limit, items }) => {
   return (
     <footer className="footer">
       <div className="total-cost">
@@ -13,7 +13,9 @@ const Footer = ({ totalCost, clearList, limit }) => {
           Limite: R$ {limit.toFixed(2).replace('.', ',')}
         </div>
       )}
-      <img src={deleteIcon} alt="Limpar Lista" onClick={clearList} className="clear-list" />
+      {items.length > 0 && (
+        <img src={deleteIcon} alt="Limpar Lista" onClick={clearList} className="clear-list" />
+      )}
     </footer>
   );
 };

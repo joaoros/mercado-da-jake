@@ -193,7 +193,7 @@ const App = () => {
           />
         )}
       </main>
-      <Footer totalCost={totalCost} clearList={confirmClearList} limit={limit} />
+      <Footer totalCost={totalCost} clearList={confirmClearList} limit={limit} items={items} />
       <button className="floating-button" onClick={openModal}>+</button>
       <AddItemModal
         isOpen={isModalOpen}
