@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import Header from './components/Header';
-import Footer from './components/Footer';
 import './styles/App.css';
 
 const App = () => {
@@ -10,20 +9,32 @@ const App = () => {
   });
   const [newItem, setNewItem] = React.useState('');
   const [newPrice, setNewPrice] = React.useState('');
+  const [formattedPrice, setFormattedPrice] = React.useState('');
   const [editingIndex, setEditingIndex] = React.useState(null);
   const [editingItem, setEditingItem] = React.useState({ name: '', price: '' });
-  const bottomRef = useRef(null);
 
   React.useEffect(() => {
     localStorage.setItem('shoppingList', JSON.stringify(items));
   }, [items]);
 
+  const formatPrice = (value) => {
+    const cleanedValue = value.replace(/\D/g, '');
+    const formattedValue = (cleanedValue / 100).toFixed(2).replace('.', ',');
+    return formattedValue;
+  };
+
+  const handlePriceChange = (e) => {
+    const value = e.target.value;
+    setNewPrice(value);
+    setFormattedPrice(formatPrice(value));
+  };
+
   const addItem = () => {
     if (newItem.trim() && newPrice.trim()) {
-      setItems([...items, { name: newItem, price: parseFloat(newPrice), purchased: false }]);
+      setItems([...items, { name: newItem, price: parseFloat(newPrice.replace(',', '.')), purchased: false }]);
       setNewItem('');
       setNewPrice('');
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setFormattedPrice('');
     }
   };
 
@@ -71,10 +82,10 @@ const App = () => {
             onKeyDown={handleKeyDown}
           />
           <input
-            type="number"
+            type="text"
             placeholder="Preço (R$)"
-            value={newPrice}
-            onChange={(e) => setNewPrice(e.target.value)}
+            value={formattedPrice}
+            onChange={handlePriceChange}
             onKeyDown={handleKeyDown}
           />
           <button onClick={addItem}>Adicionar</button>
@@ -96,9 +107,9 @@ const App = () => {
                     onChange={(e) => setEditingItem({ ...editingItem, price: e.target.value })}
                     className="edit-input"
                   />
-                  <button onClick={() => saveEdit(index)}>Salvar</button>
+                  <button className="save-edit-button" onClick={() => saveEdit(index)}>Salvar</button>
                 </>
-              ) : (
+              ) : ( 
                 <>
                   <span>{item.name}</span>
                   <span>R$ {item.price.toFixed(2)}</span>
@@ -110,12 +121,10 @@ const App = () => {
               )}
             </li>
           ))}
-          <div ref={bottomRef}></div>
         </ul>
         <div className="total">Total: R$ {totalCost.toFixed(2)}</div>
         <button onClick={clearList} className="clear-list-button">Limpar Lista</button>
       </main>
-      <Footer />
     </div>
   );
 };
