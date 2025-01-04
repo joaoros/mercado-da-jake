@@ -1,9 +1,9 @@
 import React from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ItemList from './components/ItemList';
+import { AddItemModal, EditItemModal, ConfirmDeleteModal, ConfirmClearListModal, SetLimitModal, ResetLimitModal } from './components/Modals';
 import './styles/App.css';
-import editIcon from './assets/edit.svg';
-import deleteIcon from './assets/delete.svg';
 import boxIcon from './assets/box.svg';
 
 const App = () => {
@@ -39,6 +39,11 @@ const App = () => {
   const handlePriceChange = (e) => {
     const value = e.target.value;
     setFormattedPrice(formatPrice(value));
+  };
+
+  const handleLimitValue = (e) => {
+    const value = e.target.value;
+    setLimitValue(formatPrice(value));
   };
 
   const handleEditPriceChange = (e) => {
@@ -170,7 +175,6 @@ const App = () => {
   const resetLimitHandler = () => {
     setLimit(null);
     setIsResetLimitModalOpen(false);
-    setIsModalOpen(true);
   };
 
   return (
@@ -183,124 +187,60 @@ const App = () => {
             <p>Sua lista de compras está vazia.</p>
           </div>
         ) : (
-          <ul className="item-list">
-            {items.map((item, index) => (
-              <li key={index}>
-                <span>{item.name}</span>
-                <span>R$ {item.price.toFixed(2).replace('.', ',')}</span>
-                <div className="quantity-controls">
-                  <button onClick={() => decrementQuantity(index)}>-</button>
-                  <span>{item.quantity}</span>
-                  <button onClick={() => incrementQuantity(index)}>+</button>
-                </div>
-                <div className="actions">
-                  <img src={editIcon} alt="Editar" onClick={() => startEditing(index)} className="action-icon" />
-                  <img src={deleteIcon} alt="Remover" onClick={() => confirmDeleteItem(index)} className="action-icon" />
-                </div>
-              </li>
-            ))}
-          </ul>
+          <ItemList
+            items={items}
+            startEditing={startEditing}
+            confirmDeleteItem={confirmDeleteItem}
+            incrementQuantity={incrementQuantity}
+            decrementQuantity={decrementQuantity}
+          />
         )}
       </main>
       <Footer totalCost={totalCost} clearList={confirmClearList} limit={limit} />
       <button className="floating-button" onClick={openModal}>+</button>
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <img src={deleteIcon} alt="Fechar" onClick={closeModal} className="close-button" />
-            <div className="add-item-modal">
-              {errorMessage && <div className="error-message">{errorMessage}</div>}
-              <input
-                type="text"
-                placeholder="Nome do item"
-                value={newItem}
-                onChange={(e) => setNewItem(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-              <input
-                type="number"
-                placeholder="Preço (R$)"
-                value={formattedPrice}
-                onChange={handlePriceChange}
-                onKeyDown={handleKeyDown}
-                pattern="[0-9]*"
-              />
-              <button onClick={addItem}>Adicionar</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {isEditModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <img src={deleteIcon} alt="Fechar" onClick={() => setIsEditModalOpen(false)} className="close-button" />
-            <div className="add-item-modal">
-              {errorMessage && <div className="error-message">{errorMessage}</div>}
-              <input
-                type="text"
-                value={editingItem.name}
-                onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                className="edit-input"
-              />
-              <input
-                type="number"
-                value={editingItem.price}
-                onChange={handleEditPriceChange}
-                className="edit-input"
-                pattern="[0-9]*"
-              />
-              <button className="save-edit-button" onClick={() => saveEdit(editingIndex)}>Salvar</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {isDeleteModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <img src={deleteIcon} alt="Fechar" onClick={() => setIsDeleteModalOpen(false)} className="close-button" />
-            <p>Tem certeza que deseja deletar este item?</p>
-            <button className="modal-button" onClick={deleteItem}>Sim</button>
-            <button className="modal-button" onClick={() => setIsDeleteModalOpen(false)}>Não</button>
-          </div>
-        </div>
-      )}
-      {isClearListModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <img src={deleteIcon} alt="Fechar" onClick={() => setIsClearListModalOpen(false)} className="close-button" />
-            <p>Tem certeza que deseja limpar a lista?</p>
-            <button className="modal-button" onClick={clearList}>Sim</button>
-            <button className="modal-button" onClick={() => setIsClearListModalOpen(false)}>Não</button>
-          </div>
-        </div>
-      )}
-      {isResetLimitModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <img src={deleteIcon} alt="Fechar" onClick={closeModal} className="close-button" />
-            <p>A lista está vazia. Gostaria de resetar o limite?</p>
-            <button className="modal-button" onClick={resetLimitHandler}>Sim</button>
-            <button className="modal-button" onClick={() => setIsResetLimitModalOpen(false)}>Não</button>
-          </div>
-        </div>
-      )}
-      {isLimitModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <img src={deleteIcon} alt="Fechar" onClick={closeModal} className="close-button" />
-            <div className="add-item-modal">
-              <input
-                type="number"
-                placeholder="Definir valor limite (R$)"
-                value={limitValue}
-                onChange={(e) => setLimitValue(formatPrice(e.target.value))}
-                pattern="[0-9]*"
-              />
-              <button onClick={setLimitValueHandler}>Definir</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddItemModal
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        errorMessage={errorMessage}
+        newItem={newItem}
+        setNewItem={setNewItem}
+        formattedPrice={formattedPrice}
+        handlePriceChange={handlePriceChange}
+        addItem={addItem}
+        handleKeyDown={handleKeyDown}
+      />
+      <EditItemModal
+        isOpen={isEditModalOpen}
+        closeModal={() => setIsEditModalOpen(false)}
+        errorMessage={errorMessage}
+        editingItem={editingItem}
+        setEditingItem={setEditingItem}
+        handleEditPriceChange={handleEditPriceChange}
+        saveEdit={saveEdit}
+        editingIndex={editingIndex}
+      />
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        closeModal={() => setIsDeleteModalOpen(false)}
+        deleteItem={deleteItem}
+      />
+      <ConfirmClearListModal
+        isOpen={isClearListModalOpen}
+        closeModal={() => setIsClearListModalOpen(false)}
+        clearList={clearList}
+      />
+      <SetLimitModal
+        isOpen={isLimitModalOpen}
+        closeModal={closeModal}
+        limitValue={limitValue}
+        handleLimitValue={handleLimitValue}
+        setLimitValueHandler={setLimitValueHandler}
+      />
+      <ResetLimitModal
+        isOpen={isResetLimitModalOpen}
+        closeModal={() => setIsResetLimitModalOpen(false)}
+        resetLimitHandler={resetLimitHandler}
+      />
     </div>
   );
 };
