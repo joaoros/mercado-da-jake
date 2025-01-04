@@ -29,7 +29,8 @@ const App = () => {
 
   const handleEditPriceChange = (e) => {
     const value = e.target.value;
-    setEditingItem({ ...editingItem, price: formatPrice(value) });
+    const formattedValue = formatPrice(value);
+    setEditingItem({ ...editingItem, price: parseFloat(formattedValue.replace(',', '.')) });
   };
 
   const addItem = () => {
@@ -55,7 +56,7 @@ const App = () => {
     setEditingIndex(index);
     setEditingItem({
       name: itemToEdit.name,
-      price: formatPrice(String(itemToEdit.price).replace('.', ''))
+      price: itemToEdit.price
     });
   };
 
@@ -63,7 +64,7 @@ const App = () => {
     const updatedItems = [...items];
     updatedItems[index] = {
       ...editingItem,
-      price: parseFloat(String(editingItem.price).replace(',', '.'))
+      price: parseFloat(editingItem.price)
     };
     setItems(updatedItems);
     setEditingIndex(null);
@@ -110,7 +111,7 @@ const App = () => {
                     className="edit-input"
                   />
                   <input
-                    type="text"
+                    type="number"
                     value={editingItem.price}
                     onChange={handleEditPriceChange}
                     className="edit-input"
