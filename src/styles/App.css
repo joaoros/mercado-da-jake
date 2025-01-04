@@ -62,10 +62,15 @@ body {
   word-break: break-word;
 }
 
-.item-list li span:nth-child(1),
+.item-list li span:nth-child(1) {
+  text-align: left;
+  padding-right: 5%;
+}
+
 .item-list li span:nth-child(2) {
   text-align: left;
 }
+
 
 .item-list li:last-child {
   border-bottom: none;
@@ -100,22 +105,6 @@ body {
   border-radius: 10px;
 }
 
-.clear-list-button {
-  margin-top: 1vh;
-  margin-bottom: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #ff9ed6;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.clear-list-button:hover {
-  background-color: #ff93d2;
-}
-
 @media (max-width: 600px) {
   .add-item {
     display: flex;
@@ -124,16 +113,60 @@ body {
   }
 
   .item-list li {
-    width: 85%;
+    width: 90%;
   }
 
   .actions {
     display: flex;
     flex-direction: column;
-    align-items: center;
   }
 
-  .actions button {
-    margin: 5px 0;
-  }
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-controls button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: white;
+}
+
+.quantity-controls button:hover {
+  background-color: #f9f9f9;
+}
+
+.quantity-controls span {
+  font-size: 16px;
+  margin: 0 5px;
+}
+
+.action-icon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.action-icon:hover {
+  opacity: 0.8;
+}
+
+.total {
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.total img {
+  margin-left: 10px;
+  cursor: pointer;
 }

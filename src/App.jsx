@@ -1,6 +1,8 @@
 import React from 'react';
 import Header from './components/Header';
 import './styles/App.css';
+import editIcon from './assets/edit.svg';
+import deleteIcon from './assets/delete.svg';
 
 const App = () => {
   const [items, setItems] = React.useState(() => {
@@ -38,7 +40,7 @@ const App = () => {
       setErrorMessage('Nome do item e preço são obrigatórios.');
       return;
     }
-    setItems([...items, { name: newItem, price: parseFloat(formattedPrice) }]);
+    setItems([...items, { name: newItem, price: parseFloat(formattedPrice), quantity: 1 }]);
     setNewItem('');
     setFormattedPrice('');
     setErrorMessage('');
@@ -71,7 +73,8 @@ const App = () => {
     const updatedItems = [...items];
     updatedItems[index] = {
       ...editingItem,
-      price: parseFloat(editingItem.price)
+      price: parseFloat(editingItem.price),
+      quantity: items[index].quantity // Preserve the quantity
     };
     setItems(updatedItems);
     setEditingIndex(null);
@@ -84,7 +87,21 @@ const App = () => {
     localStorage.removeItem('shoppingList');
   };
 
-  const totalCost = items.reduce((total, item) => total + item.price, 0);
+  const incrementQuantity = (index) => {
+    const updatedItems = [...items];
+    updatedItems[index].quantity += 1;
+    setItems(updatedItems);
+  };
+
+  const decrementQuantity = (index) => {
+    const updatedItems = [...items];
+    if (updatedItems[index].quantity > 1) {
+      updatedItems[index].quantity -= 1;
+      setItems(updatedItems);
+    }
+  };
+
+  const totalCost = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
     <div className="app">
@@ -133,17 +150,24 @@ const App = () => {
                 <>
                   <span>{item.name}</span>
                   <span>R$ {item.price.toFixed(2).replace('.', ',')}</span>
+                  <div className="quantity-controls">
+                    <button onClick={() => decrementQuantity(index)}>-</button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => incrementQuantity(index)}>+</button>
+                  </div>
                   <div className="actions">
-                    <button onClick={() => startEditing(index)}>Editar</button>
-                    <button onClick={() => removeItem(index)}>Remover</button>
+                    <img src={editIcon} alt="Editar" onClick={() => startEditing(index)} className="action-icon" />
+                    <img src={deleteIcon} alt="Remover" onClick={() => removeItem(index)} className="action-icon" />
                   </div>
                 </>
               )}
             </li>
           ))}
         </ul>
-        <div className="total">Total: R$ {totalCost.toFixed(2).replace('.', ',')}</div>
-        <button onClick={clearList} className="clear-list-button">Limpar Lista</button>
+        <div className="total">
+          Total: R$ {totalCost.toFixed(2).replace('.', ',')}
+          <img src={deleteIcon} alt="Limpar Lista" onClick={clearList} className="action-icon" />
+        </div>
       </main>
     </div>
   );
