@@ -1,16 +1,13 @@
 import React from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import ItemList from './components/ItemList';
+import { Header, Footer, ItemList } from './components';
 import { AddItemModal, EditItemModal, ConfirmDeleteModal, ConfirmClearListModal, SetLimitModal, ResetLimitModal } from './components/Modals';
-import './styles/App.css';
+import { getShoppingList, saveShoppingList, removeShoppingList } from './service/localStorage';
+import { formatPrice } from './service/formatting';
 import boxIcon from './assets/box.svg';
+import './styles/App.css';
 
 const App = () => {
-  const [items, setItems] = React.useState(() => {
-    const savedItems = localStorage.getItem('shoppingList');
-    return savedItems ? JSON.parse(savedItems) : [];
-  });
+  const [items, setItems] = React.useState(getShoppingList);
   const [newItem, setNewItem] = React.useState('');
   const [formattedPrice, setFormattedPrice] = React.useState('');
   const [editingIndex, setEditingIndex] = React.useState(null);
@@ -27,14 +24,8 @@ const App = () => {
   const [limitValue, setLimitValue] = React.useState('');
 
   React.useEffect(() => {
-    localStorage.setItem('shoppingList', JSON.stringify(items));
+    saveShoppingList(items);
   }, [items]);
-
-  const formatPrice = (value) => {
-    const cleanedValue = value.replace(/\D/g, '');
-    const formattedValue = (cleanedValue / 100).toFixed(2);
-    return formattedValue;
-  };
 
   const handlePriceChange = (e) => {
     const value = e.target.value;
@@ -79,7 +70,7 @@ const App = () => {
   };
 
   const deleteItem = () => {
-    const itemPrice = items[itemToDelete].price;
+    const itemPrice = items[itemToDelete].price * items[itemToDelete].quantity;
     setItems(items.filter((_, i) => i !== itemToDelete));
     if (limit !== null) {
       setLimit(limit + itemPrice);
@@ -113,7 +104,7 @@ const App = () => {
     };
     setItems(updatedItems);
     if (limit !== null) {
-      setLimit(limit + oldPrice - newPrice);
+      setLimit(limit + (oldPrice - newPrice) * items[index].quantity);
     }
     setEditingIndex(null);
     setEditingItem({ name: '', price: '' });
@@ -131,7 +122,7 @@ const App = () => {
 
   const clearList = () => {
     setItems([]);
-    localStorage.removeItem('shoppingList');
+    removeShoppingList();
     setIsClearListModalOpen(false);
     setLimit(null);
   };
@@ -140,6 +131,9 @@ const App = () => {
     const updatedItems = [...items];
     updatedItems[index].quantity += 1;
     setItems(updatedItems);
+    if (limit !== null) {
+      setLimit(limit - updatedItems[index].price);
+    }
   };
 
   const decrementQuantity = (index) => {
@@ -147,10 +141,11 @@ const App = () => {
     if (updatedItems[index].quantity > 1) {
       updatedItems[index].quantity -= 1;
       setItems(updatedItems);
+      if (limit !== null) {
+        setLimit(limit + updatedItems[index].price);
+      }
     }
   };
-
-  const totalCost = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const openModal = () => {
     if (items.length === 0 && limit === null) {
@@ -171,11 +166,13 @@ const App = () => {
     setLimitValue('');
     setIsLimitModalOpen(false);
   };
-
+  
   const resetLimitHandler = () => {
     setLimit(null);
     setIsResetLimitModalOpen(false);
   };
+
+  const totalCost = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
     <div className="app">
