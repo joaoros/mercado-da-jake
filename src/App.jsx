@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import './styles/App.css';
 import editIcon from './assets/edit.svg';
 import deleteIcon from './assets/delete.svg';
@@ -105,7 +106,7 @@ const App = () => {
 
   return (
     <div className="app">
-      <Header title="🛒 Mercado da Jake 💗" />
+      <Header emoji="🛒" title="Mercado da Jake 💗" />
       <main className="content">
         <div className="add-item">
           <input
@@ -164,11 +165,8 @@ const App = () => {
             </li>
           ))}
         </ul>
-        <div className="total">
-          Total: R$ {totalCost.toFixed(2).replace('.', ',')}
-          <img src={deleteIcon} alt="Limpar Lista" onClick={clearList} className="action-icon" />
-        </div>
       </main>
+      <Footer totalCost={totalCost} clearList={clearList} />
     </div>
   );
 };

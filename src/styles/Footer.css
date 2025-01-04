@@ -1,0 +1,22 @@
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ccc;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+  
+.total-cost {
+    padding-left: 10px;
+    font-size: 18px;
+}
+
+.clear-list {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
