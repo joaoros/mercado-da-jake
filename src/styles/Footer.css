@@ -11,12 +11,13 @@
 }
   
 .total-cost {
-    padding-left: 10px;
+    padding-left: 15px;
     font-size: 18px;
 }
 
 .clear-list {
     width: 24px;
     height: 24px;
+    margin-right: 2vh;
     cursor: pointer;
 }

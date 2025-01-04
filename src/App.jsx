@@ -15,6 +15,11 @@ const App = () => {
   const [editingIndex, setEditingIndex] = React.useState(null);
   const [editingItem, setEditingItem] = React.useState({ name: '', price: '' });
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
+  const [isClearListModalOpen, setIsClearListModalOpen] = React.useState(false);
+  const [itemToDelete, setItemToDelete] = React.useState(null);
 
   React.useEffect(() => {
     localStorage.setItem('shoppingList', JSON.stringify(items));
@@ -45,6 +50,7 @@ const App = () => {
     setNewItem('');
     setFormattedPrice('');
     setErrorMessage('');
+    closeModal();
   };
 
   const handleKeyDown = (e) => {
@@ -53,8 +59,15 @@ const App = () => {
     }
   };
 
-  const removeItem = (index) => {
-    setItems(items.filter((_, i) => i !== index));
+  const confirmDeleteItem = (index) => {
+    setItemToDelete(index);
+    setIsDeleteModalOpen(true);
+  };
+
+  const deleteItem = () => {
+    setItems(items.filter((_, i) => i !== itemToDelete));
+    setItemToDelete(null);
+    setIsDeleteModalOpen(false);
   };
 
   const startEditing = (index) => {
@@ -64,6 +77,7 @@ const App = () => {
       name: itemToEdit.name,
       price: itemToEdit.price.toFixed(2)
     });
+    setIsEditModalOpen(true);
   };
 
   const saveEdit = (index) => {
@@ -81,11 +95,17 @@ const App = () => {
     setEditingIndex(null);
     setEditingItem({ name: '', price: '' });
     setErrorMessage('');
+    setIsEditModalOpen(false);
+  };
+
+  const confirmClearList = () => {
+    setIsClearListModalOpen(true);
   };
 
   const clearList = () => {
     setItems([]);
     localStorage.removeItem('shoppingList');
+    setIsClearListModalOpen(false);
   };
 
   const incrementQuantity = (index) => {
@@ -104,69 +124,102 @@ const App = () => {
 
   const totalCost = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="app">
-      <Header emoji="🛒" title="Mercado da Jake 💗" />
-      <main className="content">
-        <div className="add-item">
-          <input
-            type="text"
-            placeholder="Nome do item"
-            value={newItem}
-            onChange={(e) => setNewItem(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <input
-            type="number"
-            placeholder="Preço (R$)"
-            value={formattedPrice}
-            onChange={handlePriceChange}
-            onKeyDown={handleKeyDown}
-            pattern="[0-9]*"
-          />
-          <button onClick={addItem}>Adicionar</button>
-        </div>
+      <Header title="Mercado da Jake 🛒💗" />
+      <main>
         {errorMessage && <div className="error-message">{errorMessage}</div>}
         <ul className="item-list">
           {items.map((item, index) => (
             <li key={index}>
-              {editingIndex === index ? (
-                <>
-                  <input
-                    type="text"
-                    value={editingItem.name}
-                    onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                    className="edit-input"
-                  />
-                  <input
-                    type="number"
-                    value={editingItem.price}
-                    onChange={handleEditPriceChange}
-                    className="edit-input"
-                    pattern="[0-9]*"
-                  />
-                  <button className="save-edit-button" onClick={() => saveEdit(index)}>Salvar</button>
-                </>
-              ) : (
-                <>
-                  <span>{item.name}</span>
-                  <span>R$ {item.price.toFixed(2).replace('.', ',')}</span>
-                  <div className="quantity-controls">
-                    <button onClick={() => decrementQuantity(index)}>-</button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => incrementQuantity(index)}>+</button>
-                  </div>
-                  <div className="actions">
-                    <img src={editIcon} alt="Editar" onClick={() => startEditing(index)} className="action-icon" />
-                    <img src={deleteIcon} alt="Remover" onClick={() => removeItem(index)} className="action-icon" />
-                  </div>
-                </>
-              )}
+              <span>{item.name}</span>
+              <span>R$ {item.price.toFixed(2).replace('.', ',')}</span>
+              <div className="quantity-controls">
+                <button onClick={() => decrementQuantity(index)}>-</button>
+                <span>{item.quantity}</span>
+                <button onClick={() => incrementQuantity(index)}>+</button>
+              </div>
+              <div className="actions">
+                <img src={editIcon} alt="Editar" onClick={() => startEditing(index)} className="action-icon" />
+                <img src={deleteIcon} alt="Remover" onClick={() => confirmDeleteItem(index)} className="action-icon" />
+              </div>
             </li>
           ))}
         </ul>
       </main>
-      <Footer totalCost={totalCost} clearList={clearList} />
+      <Footer totalCost={totalCost} clearList={confirmClearList} />
+      <button className="floating-button" onClick={openModal}>+</button>
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <img src={deleteIcon} alt="Fechar" onClick={closeModal} className="close-button" />
+            <div className="add-item-modal">
+              <input
+                type="text"
+                placeholder="Nome do item"
+                value={newItem}
+                onChange={(e) => setNewItem(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <input
+                type="number"
+                placeholder="Preço (R$)"
+                value={formattedPrice}
+                onChange={handlePriceChange}
+                onKeyDown={handleKeyDown}
+                pattern="[0-9]*"
+              />
+              <button onClick={addItem}>Adicionar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isEditModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <img src={deleteIcon} alt="Fechar" onClick={() => setIsEditModalOpen(false)} className="close-button" />
+            <div className="add-item-modal">
+              <input
+                type="text"
+                value={editingItem.name}
+                onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
+                className="edit-input"
+              />
+              <input
+                type="number"
+                value={editingItem.price}
+                onChange={handleEditPriceChange}
+                className="edit-input"
+                pattern="[0-9]*"
+              />
+              <button className="save-edit-button" onClick={() => saveEdit(editingIndex)}>Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isDeleteModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <img src={deleteIcon} alt="Fechar" onClick={() => setIsDeleteModalOpen(false)} className="close-button" />
+            <p>Tem certeza que deseja deletar este item?</p>
+            <button className="modal-button" onClick={deleteItem}>Sim</button>
+            <button className="modal-button" onClick={() => setIsDeleteModalOpen(false)}>Não</button>
+          </div>
+        </div>
+      )}
+      {isClearListModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <img src={deleteIcon} alt="Fechar" onClick={() => setIsClearListModalOpen(false)} className="close-button" />
+            <p>Tem certeza que deseja limpar a lista?</p>
+            <button className="modal-button" onClick={clearList}>Sim</button>
+            <button className="modal-button" onClick={() => setIsClearListModalOpen(false)}>Não</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

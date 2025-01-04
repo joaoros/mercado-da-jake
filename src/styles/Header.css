@@ -1,17 +1,10 @@
 .header {
   background-color: #ff9ed6;
   color: white;
-  padding: 10px 15px;
-}
-
-.elements {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
+  padding: 20px 15px;
 }
 
 .header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
 }
