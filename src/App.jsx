@@ -20,7 +20,11 @@ const App = () => {
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [isClearListModalOpen, setIsClearListModalOpen] = React.useState(false);
+  const [isLimitModalOpen, setIsLimitModalOpen] = React.useState(false);
+  const [isResetLimitModalOpen, setIsResetLimitModalOpen] = React.useState(false);
   const [itemToDelete, setItemToDelete] = React.useState(null);
+  const [limit, setLimit] = React.useState(null);
+  const [limitValue, setLimitValue] = React.useState('');
 
   React.useEffect(() => {
     localStorage.setItem('shoppingList', JSON.stringify(items));
@@ -47,10 +51,14 @@ const App = () => {
       setErrorMessage('Nome do item e preço são obrigatórios.');
       return;
     }
-    setItems([...items, { name: newItem, price: parseFloat(formattedPrice), quantity: 1 }]);
+    const itemPrice = parseFloat(formattedPrice);
+    setItems([...items, { name: newItem, price: itemPrice, quantity: 1 }]);
     setNewItem('');
     setFormattedPrice('');
     setErrorMessage('');
+    if (limit !== null) {
+      setLimit(limit - itemPrice);
+    }
     closeModal();
   };
 
@@ -66,7 +74,11 @@ const App = () => {
   };
 
   const deleteItem = () => {
+    const itemPrice = items[itemToDelete].price;
     setItems(items.filter((_, i) => i !== itemToDelete));
+    if (limit !== null) {
+      setLimit(limit + itemPrice);
+    }
     setItemToDelete(null);
     setIsDeleteModalOpen(false);
   };
@@ -87,12 +99,17 @@ const App = () => {
       return;
     }
     const updatedItems = [...items];
+    const oldPrice = items[index].price;
+    const newPrice = parseFloat(editingItem.price);
     updatedItems[index] = {
       ...editingItem,
-      price: parseFloat(editingItem.price),
-      quantity: items[index].quantity // Preserve the quantity
+      price: newPrice,
+      quantity: items[index].quantity
     };
     setItems(updatedItems);
+    if (limit !== null) {
+      setLimit(limit + oldPrice - newPrice);
+    }
     setEditingIndex(null);
     setEditingItem({ name: '', price: '' });
     setErrorMessage('');
@@ -100,13 +117,18 @@ const App = () => {
   };
 
   const confirmClearList = () => {
-    setIsClearListModalOpen(true);
+    if (items.length === 0 && limit !== null) {
+      setIsResetLimitModalOpen(true);
+    } else {
+      setIsClearListModalOpen(true);
+    }
   };
 
   const clearList = () => {
     setItems([]);
     localStorage.removeItem('shoppingList');
     setIsClearListModalOpen(false);
+    setLimit(null);
   };
 
   const incrementQuantity = (index) => {
@@ -125,14 +147,36 @@ const App = () => {
 
   const totalCost = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModal = () => {
+    if (items.length === 0 && limit === null) {
+      setIsLimitModalOpen(true);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setIsLimitModalOpen(false);
+    setIsResetLimitModalOpen(false);
+  };
+
+  const setLimitValueHandler = () => {
+    setLimit(parseFloat(formatPrice(limitValue)));
+    setLimitValue('');
+    setIsLimitModalOpen(false);
+  };
+
+  const resetLimitHandler = () => {
+    setLimit(null);
+    setIsResetLimitModalOpen(false);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="app">
       <Header title="Mercado da Jake 🛒💗" />
       <main>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
         {items.length === 0 ? (
           <div className="empty-list">
             <img src={boxIcon} alt="Lista vazia" className="empty-list-icon" />
@@ -158,13 +202,14 @@ const App = () => {
           </ul>
         )}
       </main>
-      <Footer totalCost={totalCost} clearList={confirmClearList} />
+      <Footer totalCost={totalCost} clearList={confirmClearList} limit={limit} />
       <button className="floating-button" onClick={openModal}>+</button>
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
             <img src={deleteIcon} alt="Fechar" onClick={closeModal} className="close-button" />
             <div className="add-item-modal">
+              {errorMessage && <div className="error-message">{errorMessage}</div>}
               <input
                 type="text"
                 placeholder="Nome do item"
@@ -190,6 +235,7 @@ const App = () => {
           <div className="modal-content">
             <img src={deleteIcon} alt="Fechar" onClick={() => setIsEditModalOpen(false)} className="close-button" />
             <div className="add-item-modal">
+              {errorMessage && <div className="error-message">{errorMessage}</div>}
               <input
                 type="text"
                 value={editingItem.name}
@@ -225,6 +271,33 @@ const App = () => {
             <p>Tem certeza que deseja limpar a lista?</p>
             <button className="modal-button" onClick={clearList}>Sim</button>
             <button className="modal-button" onClick={() => setIsClearListModalOpen(false)}>Não</button>
+          </div>
+        </div>
+      )}
+      {isResetLimitModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <img src={deleteIcon} alt="Fechar" onClick={closeModal} className="close-button" />
+            <p>A lista está vazia. Gostaria de resetar o limite?</p>
+            <button className="modal-button" onClick={resetLimitHandler}>Sim</button>
+            <button className="modal-button" onClick={() => setIsResetLimitModalOpen(false)}>Não</button>
+          </div>
+        </div>
+      )}
+      {isLimitModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <img src={deleteIcon} alt="Fechar" onClick={closeModal} className="close-button" />
+            <div className="add-item-modal">
+              <input
+                type="number"
+                placeholder="Definir valor limite (R$)"
+                value={limitValue}
+                onChange={(e) => setLimitValue(formatPrice(e.target.value))}
+                pattern="[0-9]*"
+              />
+              <button onClick={setLimitValueHandler}>Definir</button>
+            </div>
           </div>
         </div>
       )}
