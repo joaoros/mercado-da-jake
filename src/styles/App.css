@@ -44,11 +44,6 @@ body {
   text-align: left;
 }
 
-
-.item-list li:last-child {
-  border-bottom: none;
-}
-
 .actions button,
 .save-edit-button {
   margin-left: 5px;
@@ -217,4 +212,19 @@ input[type=number]::-webkit-outer-spin-button {
 
 .modal-button:hover {
   background-color: #ff93d2;
+}
+
+.empty-list {
+  padding: 5%;
+}
+
+.empty-list p {
+  margin: 0;
+  color: #777;
+}
+
+.empty-list-icon {
+  opacity: 0.3;
+  width: 100px;
+  height: 100px;
 }

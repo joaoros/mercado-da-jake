@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import './styles/App.css';
 import editIcon from './assets/edit.svg';
 import deleteIcon from './assets/delete.svg';
+import boxIcon from './assets/box.svg';
 
 const App = () => {
   const [items, setItems] = React.useState(() => {
@@ -132,23 +133,30 @@ const App = () => {
       <Header title="Mercado da Jake 🛒💗" />
       <main>
         {errorMessage && <div className="error-message">{errorMessage}</div>}
-        <ul className="item-list">
-          {items.map((item, index) => (
-            <li key={index}>
-              <span>{item.name}</span>
-              <span>R$ {item.price.toFixed(2).replace('.', ',')}</span>
-              <div className="quantity-controls">
-                <button onClick={() => decrementQuantity(index)}>-</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => incrementQuantity(index)}>+</button>
-              </div>
-              <div className="actions">
-                <img src={editIcon} alt="Editar" onClick={() => startEditing(index)} className="action-icon" />
-                <img src={deleteIcon} alt="Remover" onClick={() => confirmDeleteItem(index)} className="action-icon" />
-              </div>
-            </li>
-          ))}
-        </ul>
+        {items.length === 0 ? (
+          <div className="empty-list">
+            <img src={boxIcon} alt="Lista vazia" className="empty-list-icon" />
+            <p>Sua lista de compras está vazia.</p>
+          </div>
+        ) : (
+          <ul className="item-list">
+            {items.map((item, index) => (
+              <li key={index}>
+                <span>{item.name}</span>
+                <span>R$ {item.price.toFixed(2).replace('.', ',')}</span>
+                <div className="quantity-controls">
+                  <button onClick={() => decrementQuantity(index)}>-</button>
+                  <span>{item.quantity}</span>
+                  <button onClick={() => incrementQuantity(index)}>+</button>
+                </div>
+                <div className="actions">
+                  <img src={editIcon} alt="Editar" onClick={() => startEditing(index)} className="action-icon" />
+                  <img src={deleteIcon} alt="Remover" onClick={() => confirmDeleteItem(index)} className="action-icon" />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </main>
       <Footer totalCost={totalCost} clearList={confirmClearList} />
       <button className="floating-button" onClick={openModal}>+</button>
