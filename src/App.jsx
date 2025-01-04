@@ -11,6 +11,7 @@ const App = () => {
   const [formattedPrice, setFormattedPrice] = React.useState('');
   const [editingIndex, setEditingIndex] = React.useState(null);
   const [editingItem, setEditingItem] = React.useState({ name: '', price: '' });
+  const [errorMessage, setErrorMessage] = React.useState('');
 
   React.useEffect(() => {
     localStorage.setItem('shoppingList', JSON.stringify(items));
@@ -18,7 +19,7 @@ const App = () => {
 
   const formatPrice = (value) => {
     const cleanedValue = value.replace(/\D/g, '');
-    const formattedValue = (cleanedValue / 100).toFixed(2).replace('.', ',');
+    const formattedValue = (cleanedValue / 100).toFixed(2);
     return formattedValue;
   };
 
@@ -29,16 +30,18 @@ const App = () => {
 
   const handleEditPriceChange = (e) => {
     const value = e.target.value;
-    const formattedValue = formatPrice(value);
-    setEditingItem({ ...editingItem, price: parseFloat(formattedValue.replace(',', '.')) });
+    setEditingItem({ ...editingItem, price: formatPrice(value) });
   };
 
   const addItem = () => {
-    if (newItem.trim() && formattedPrice.trim()) {
-      setItems([...items, { name: newItem, price: parseFloat(formattedPrice.replace(',', '.')) }]);
-      setNewItem('');
-      setFormattedPrice('');
+    if (!newItem.trim() || !formattedPrice.trim()) {
+      setErrorMessage('Nome do item e preço são obrigatórios.');
+      return;
     }
+    setItems([...items, { name: newItem, price: parseFloat(formattedPrice) }]);
+    setNewItem('');
+    setFormattedPrice('');
+    setErrorMessage('');
   };
 
   const handleKeyDown = (e) => {
@@ -56,11 +59,15 @@ const App = () => {
     setEditingIndex(index);
     setEditingItem({
       name: itemToEdit.name,
-      price: itemToEdit.price
+      price: itemToEdit.price.toFixed(2)
     });
   };
 
   const saveEdit = (index) => {
+    if (!editingItem.name.trim() || !editingItem.price) {
+      setErrorMessage('Nome do item e preço são obrigatórios.');
+      return;
+    }
     const updatedItems = [...items];
     updatedItems[index] = {
       ...editingItem,
@@ -69,6 +76,7 @@ const App = () => {
     setItems(updatedItems);
     setEditingIndex(null);
     setEditingItem({ name: '', price: '' });
+    setErrorMessage('');
   };
 
   const clearList = () => {
@@ -91,14 +99,16 @@ const App = () => {
             onKeyDown={handleKeyDown}
           />
           <input
-            type="text"
+            type="number"
             placeholder="Preço (R$)"
             value={formattedPrice}
             onChange={handlePriceChange}
             onKeyDown={handleKeyDown}
+            pattern="[0-9]*"
           />
           <button onClick={addItem}>Adicionar</button>
         </div>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
         <ul className="item-list">
           {items.map((item, index) => (
             <li key={index}>
@@ -115,6 +125,7 @@ const App = () => {
                     value={editingItem.price}
                     onChange={handleEditPriceChange}
                     className="edit-input"
+                    pattern="[0-9]*"
                   />
                   <button className="save-edit-button" onClick={() => saveEdit(index)}>Salvar</button>
                 </>
