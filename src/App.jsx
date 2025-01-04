@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import Header from './components/Header';
 import './styles/App.css';
 
@@ -8,7 +8,6 @@ const App = () => {
     return savedItems ? JSON.parse(savedItems) : [];
   });
   const [newItem, setNewItem] = React.useState('');
-  const [newPrice, setNewPrice] = React.useState('');
   const [formattedPrice, setFormattedPrice] = React.useState('');
   const [editingIndex, setEditingIndex] = React.useState(null);
   const [editingItem, setEditingItem] = React.useState({ name: '', price: '' });
@@ -25,15 +24,18 @@ const App = () => {
 
   const handlePriceChange = (e) => {
     const value = e.target.value;
-    setNewPrice(value);
     setFormattedPrice(formatPrice(value));
   };
 
+  const handleEditPriceChange = (e) => {
+    const value = e.target.value;
+    setEditingItem({ ...editingItem, price: formatPrice(value) });
+  };
+
   const addItem = () => {
-    if (newItem.trim() && newPrice.trim()) {
-      setItems([...items, { name: newItem, price: parseFloat(newPrice.replace(',', '.')), purchased: false }]);
+    if (newItem.trim() && formattedPrice.trim()) {
+      setItems([...items, { name: newItem, price: parseFloat(formattedPrice.replace(',', '.')) }]);
       setNewItem('');
-      setNewPrice('');
       setFormattedPrice('');
     }
   };
@@ -49,14 +51,20 @@ const App = () => {
   };
 
   const startEditing = (index) => {
+    const itemToEdit = items[index];
     setEditingIndex(index);
-    setEditingItem({ name: items[index].name, price: items[index].price });
+    setEditingItem({
+      name: itemToEdit.name,
+      price: formatPrice(String(itemToEdit.price).replace('.', ''))
+    });
   };
 
   const saveEdit = (index) => {
-    const updatedItems = items.map((item, i) =>
-      i === index ? { ...item, name: editingItem.name, price: parseFloat(editingItem.price) } : item
-    );
+    const updatedItems = [...items];
+    updatedItems[index] = {
+      ...editingItem,
+      price: parseFloat(String(editingItem.price).replace(',', '.'))
+    };
     setItems(updatedItems);
     setEditingIndex(null);
     setEditingItem({ name: '', price: '' });
@@ -71,7 +79,7 @@ const App = () => {
 
   return (
     <div className="app">
-      <Header title="Mercado da Ja 🛒" />
+      <Header title="🛒 Mercado da Jake 💗" />
       <main className="content">
         <div className="add-item">
           <input
@@ -92,7 +100,7 @@ const App = () => {
         </div>
         <ul className="item-list">
           {items.map((item, index) => (
-            <li key={index} className={item.purchased ? 'purchased' : ''}>
+            <li key={index}>
               {editingIndex === index ? (
                 <>
                   <input
@@ -102,17 +110,17 @@ const App = () => {
                     className="edit-input"
                   />
                   <input
-                    type="number"
+                    type="text"
                     value={editingItem.price}
-                    onChange={(e) => setEditingItem({ ...editingItem, price: e.target.value })}
+                    onChange={handleEditPriceChange}
                     className="edit-input"
                   />
                   <button className="save-edit-button" onClick={() => saveEdit(index)}>Salvar</button>
                 </>
-              ) : ( 
+              ) : (
                 <>
                   <span>{item.name}</span>
-                  <span>R$ {item.price.toFixed(2)}</span>
+                  <span>R$ {item.price.toFixed(2).replace('.', ',')}</span>
                   <div className="actions">
                     <button onClick={() => startEditing(index)}>Editar</button>
                     <button onClick={() => removeItem(index)}>Remover</button>
@@ -122,7 +130,7 @@ const App = () => {
             </li>
           ))}
         </ul>
-        <div className="total">Total: R$ {totalCost.toFixed(2)}</div>
+        <div className="total">Total: R$ {totalCost.toFixed(2).replace('.', ',')}</div>
         <button onClick={clearList} className="clear-list-button">Limpar Lista</button>
       </main>
     </div>
