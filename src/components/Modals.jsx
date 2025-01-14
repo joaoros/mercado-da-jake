@@ -33,6 +33,7 @@ export const AddItemModal = ({ isOpen, closeModal, errorMessage, newItem, setNew
             onChange={(e) => setNewItemQuantity(e.target.value)}
             onKeyDown={handleKeyDown}
             min="1"
+            pattern="[0-9]*"
           />
           <button onClick={addItem}>Adicionar</button>
         </div>

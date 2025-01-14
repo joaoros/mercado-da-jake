@@ -198,7 +198,7 @@ const App = () => {
 
   return (
     <div className="app">
-      <Header title="Mercado da Jake 🛒💗" />
+      <Header title="Mercado da Ja 🛒💗" />
       <main>
         {items.length === 0 ? (
           <div className="empty-list">
