@@ -3,7 +3,7 @@ import deleteIcon from '../assets/delete.svg';
 
 import '../styles/Modals.css';
 
-export const AddItemModal = ({ isOpen, closeModal, errorMessage, newItem, setNewItem, formattedPrice, handlePriceChange, addItem, handleKeyDown }) => {
+export const AddItemModal = ({ isOpen, closeModal, errorMessage, newItem, setNewItem, formattedPrice, handlePriceChange, addItem, handleKeyDown, newItemQuantity, setNewItemQuantity }) => {
   if (!isOpen) return null;
   return (
     <div className="modal">
@@ -26,6 +26,14 @@ export const AddItemModal = ({ isOpen, closeModal, errorMessage, newItem, setNew
             onKeyDown={handleKeyDown}
             pattern="[0-9]*"
           />
+          <input
+            type="number"
+            placeholder="Quantidade"
+            value={newItemQuantity}
+            onChange={(e) => setNewItemQuantity(e.target.value)}
+            onKeyDown={handleKeyDown}
+            min="1"
+          />
           <button onClick={addItem}>Adicionar</button>
         </div>
       </div>
@@ -33,7 +41,7 @@ export const AddItemModal = ({ isOpen, closeModal, errorMessage, newItem, setNew
   );
 };
 
-export const EditItemModal = ({ isOpen, closeModal, errorMessage, editingItem, setEditingItem, handleEditPriceChange, saveEdit, editingIndex }) => {
+export const EditItemModal = ({ isOpen, closeModal, errorMessage, editingItem, setEditingItem, handleEditPriceChange, saveEdit, editingIndex, editingItemQuantity, setEditingItemQuantity }) => {
   if (!isOpen) return null;
   return (
     <div className="modal">
@@ -52,6 +60,14 @@ export const EditItemModal = ({ isOpen, closeModal, errorMessage, editingItem, s
             value={editingItem.price}
             onChange={handleEditPriceChange}
             className="edit-input"
+            pattern="[0-9]*"
+          />
+          <input
+            type="number"
+            placeholder="Quantidade"
+            value={editingItemQuantity}
+            onChange={(e) => setEditingItemQuantity(e.target.value)}
+            min="1"
             pattern="[0-9]*"
           />
           <button className="save-edit-button" onClick={() => saveEdit(editingIndex)}>Salvar</button>

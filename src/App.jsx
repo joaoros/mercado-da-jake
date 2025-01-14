@@ -13,6 +13,8 @@ const App = () => {
   const [editingIndex, setEditingIndex] = React.useState(null);
   const [editingItem, setEditingItem] = React.useState({ name: '', price: '' });
   const [errorMessage, setErrorMessage] = React.useState('');
+  const [limitValue, setLimitValue] = React.useState('');
+  const [editingItemQuantity, setEditingItemQuantity] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
@@ -21,7 +23,7 @@ const App = () => {
   const [isResetLimitModalOpen, setIsResetLimitModalOpen] = React.useState(false);
   const [itemToDelete, setItemToDelete] = React.useState(null);
   const [limit, setLimit] = React.useState(null);
-  const [limitValue, setLimitValue] = React.useState('');
+  const [newItemQuantity, setNewItemQuantity] = React.useState('');
 
   React.useEffect(() => {
     saveShoppingList(items);
@@ -43,17 +45,18 @@ const App = () => {
   };
 
   const addItem = () => {
-    if (!newItem.trim() || !formattedPrice.trim()) {
-      setErrorMessage('Nome do item e preço são obrigatórios.');
+    if (!newItem.trim() || !formattedPrice.trim() || newItemQuantity <= 0) {
+      setErrorMessage('Nome do item, preço e quantidade são obrigatórios.');
       return;
     }
     const itemPrice = parseFloat(formattedPrice);
-    setItems([...items, { name: newItem, price: itemPrice, quantity: 1 }]);
+    setItems([...items, { name: newItem, price: itemPrice, quantity: newItemQuantity }]);
     setNewItem('');
     setFormattedPrice('');
+    setNewItemQuantity('');
     setErrorMessage('');
     if (limit !== null) {
-      setLimit(limit - itemPrice);
+      setLimit(limit - itemPrice * newItemQuantity);
     }
     closeModal();
   };
@@ -86,12 +89,13 @@ const App = () => {
       name: itemToEdit.name,
       price: itemToEdit.price.toFixed(2)
     });
+    setEditingItemQuantity(itemToEdit.quantity); // Adicione esta linha
     setIsEditModalOpen(true);
   };
 
   const saveEdit = (index) => {
-    if (!editingItem.name.trim() || !editingItem.price) {
-      setErrorMessage('Nome do item e preço são obrigatórios.');
+    if (!editingItem.name.trim() || !editingItem.price || editingItemQuantity <= 0) {
+      setErrorMessage('Nome do item, preço e quantidade são obrigatórios.');
       return;
     }
     const updatedItems = [...items];
@@ -100,7 +104,7 @@ const App = () => {
     updatedItems[index] = {
       ...editingItem,
       price: newPrice,
-      quantity: items[index].quantity
+      quantity: editingItemQuantity
     };
     setItems(updatedItems);
     if (limit !== null) {
@@ -108,6 +112,7 @@ const App = () => {
     }
     setEditingIndex(null);
     setEditingItem({ name: '', price: '' });
+    setEditingItemQuantity(1);
     setErrorMessage('');
     setIsEditModalOpen(false);
   };
@@ -205,6 +210,8 @@ const App = () => {
         handlePriceChange={handlePriceChange}
         addItem={addItem}
         handleKeyDown={handleKeyDown}
+        newItemQuantity={newItemQuantity}
+        setNewItemQuantity={setNewItemQuantity}
       />
       <EditItemModal
         isOpen={isEditModalOpen}
@@ -215,6 +222,8 @@ const App = () => {
         handleEditPriceChange={handleEditPriceChange}
         saveEdit={saveEdit}
         editingIndex={editingIndex}
+        editingItemQuantity={editingItemQuantity}
+        setEditingItemQuantity={setEditingItemQuantity}
       />
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
