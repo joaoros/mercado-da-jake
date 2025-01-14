@@ -1,7 +1,15 @@
 import React from 'react';
+
 import { Header, Footer, ItemList } from './components';
-import { AddItemModal, EditItemModal, ConfirmDeleteModal, ConfirmClearListModal, SetLimitModal, ResetLimitModal } from './components/Modals';
-import { getShoppingList, saveShoppingList, removeShoppingList } from './service/localStorage';
+import { 
+  AddItemModal, EditItemModal, ConfirmDeleteModal, 
+  ConfirmClearListModal, SetLimitModal, ResetLimitModal 
+} from './components/Modals';
+import {
+  getShoppingList, saveShoppingList, removeShoppingList,
+  getLimit, saveLimit, removeLimit 
+} from './service/localStorage';
+
 import { formatPrice } from './service/formatting';
 import boxIcon from './assets/box.svg';
 import './styles/App.css';
@@ -22,12 +30,19 @@ const App = () => {
   const [isLimitModalOpen, setIsLimitModalOpen] = React.useState(false);
   const [isResetLimitModalOpen, setIsResetLimitModalOpen] = React.useState(false);
   const [itemToDelete, setItemToDelete] = React.useState(null);
-  const [limit, setLimit] = React.useState(null);
+  const [limit, setLimit] = React.useState(getLimit);
   const [newItemQuantity, setNewItemQuantity] = React.useState('');
 
   React.useEffect(() => {
     saveShoppingList(items);
   }, [items]);
+
+  React.useEffect(() => {
+    console.log('Limit:', limit);
+    if (limit !== null) {
+      saveLimit(limit);
+    }
+  }, [limit]);
 
   const handlePriceChange = (e) => {
     const value = e.target.value;
@@ -89,7 +104,7 @@ const App = () => {
       name: itemToEdit.name,
       price: itemToEdit.price.toFixed(2)
     });
-    setEditingItemQuantity(itemToEdit.quantity); // Adicione esta linha
+    setEditingItemQuantity(itemToEdit.quantity);
     setIsEditModalOpen(true);
   };
 
@@ -130,6 +145,7 @@ const App = () => {
     removeShoppingList();
     setIsClearListModalOpen(false);
     setLimit(null);
+    removeLimit();
   };
 
   const incrementQuantity = (index) => {
@@ -175,6 +191,7 @@ const App = () => {
   const resetLimitHandler = () => {
     setLimit(null);
     setIsResetLimitModalOpen(false);
+    removeLimit();
   };
 
   const totalCost = items.reduce((total, item) => total + item.price * item.quantity, 0);

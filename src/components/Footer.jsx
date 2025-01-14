@@ -9,7 +9,7 @@ const Footer = ({ totalCost, clearList, limit, items }) => {
         Total: R$ {totalCost.toFixed(2).replace('.', ',')}
       </div>
       {limit !== null && (
-        <div className="limit" style={{ fontWeight: limit < 0 ? 'bold' : 'normal' }}>
+        <div className="limit" style={{ fontWeight: limit <= 0 ? 'bold' : 'normal' }}>
           Limite: R$ {limit.toFixed(2).replace('.', ',')}
         </div>
       )}
