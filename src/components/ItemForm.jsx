@@ -1,5 +1,7 @@
 import React from 'react';
 
+import '../styles/ItemForm.css';
+
 const ItemForm = ({ newItem, setNewItem, formattedPrice, handlePriceChange, addItem, handleKeyDown, errorMessage }) => {
   return (
     <div className="add-item-modal">

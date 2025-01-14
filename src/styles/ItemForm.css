@@ -1,0 +1,27 @@
+.add-item-modal input {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: calc(100% - 22px);
+}
+  
+.add-item-modal button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ff9ed6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
+.add-item-modal button:hover {
+    background-color: #ff93d2;
+}
+
+.error-message {
+    margin-bottom: 10px;
+}

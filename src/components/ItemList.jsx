@@ -2,6 +2,8 @@ import React from 'react';
 import editIcon from '../assets/edit.svg';
 import deleteIcon from '../assets/delete.svg';
 
+import '../styles/ItemList.css';
+
 const ItemList = ({ items, startEditing, confirmDeleteItem, incrementQuantity, decrementQuantity }) => {
   return (
     <ul className="item-list">

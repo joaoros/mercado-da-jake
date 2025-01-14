@@ -1,6 +1,8 @@
 import React from 'react';
 import deleteIcon from '../assets/delete.svg';
 
+import '../styles/Modals.css';
+
 export const AddItemModal = ({ isOpen, closeModal, errorMessage, newItem, setNewItem, formattedPrice, handlePriceChange, addItem, handleKeyDown }) => {
   if (!isOpen) return null;
   return (
