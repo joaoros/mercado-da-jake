@@ -1,3 +1,9 @@
+@media (max-width: 600px) {
+  .item-list {
+    padding-bottom: 60px !important;
+  }
+}
+
 .item-list {
   padding: 0;
   display: flex;
