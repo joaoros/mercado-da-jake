@@ -13,7 +13,7 @@ const Footer = ({ totalCost, clearList, limit, items }) => {
           Limite: R$ {limit.toFixed(2).replace('.', ',')}
         </div>
       )}
-      {items.length > 0 && (
+      {(items.length > 0 || limit !== null) && (
         <img src={deleteIcon} alt="Limpar Lista" onClick={clearList} className="clear-list" />
       )}
     </footer>
