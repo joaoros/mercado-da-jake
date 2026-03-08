@@ -150,7 +150,7 @@ const App = () => {
 
   const incrementQuantity = (index) => {
     const updatedItems = [...items];
-    updatedItems[index].quantity += 1;
+    updatedItems[index].quantity = parseInt(updatedItems[index].quantity) + 1;
     setItems(updatedItems);
     if (limit !== null) {
       setLimit(limit - updatedItems[index].price);
